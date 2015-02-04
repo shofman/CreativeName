@@ -9,27 +9,46 @@ public class Galaxy : MonoBehaviour {
 	public int planetRows;
 	public int planetColumns;
 
+	public const string TRADE_ROUTE_HOLDER = "TradeRouterHolder"; 
+
 	GameObject[,] listOfPlanets;
 	GameObject planetsHolder;
+	GameObject tradeRouteHolder;
 	List<string> planetNames;
 
 	void Awake() {
 		NameGenerator nameGenerator = new NameGenerator(3000);
 		// Dictionary<string, int> amounts = new Dictionary<string, int>();
 		planetNames = nameGenerator.generatePlanetNames();
-		Transform[] transforms = this.GetComponentsInChildren<Transform>();
+		planetsHolder = createPlanetHolder();
+		tradeRouteHolder = createTradeRouteHolder();
+	}
+
+	GameObject createPlanetHolder() {
+		return createEmptyGameObject("PlanetsHolder");
+	}
+
+	GameObject createTradeRouteHolder() {
+		return createEmptyGameObject(TRADE_ROUTE_HOLDER);
+	}
+
+	GameObject createEmptyGameObject(string name) {
+		GameObject generic = null;
 		bool found = false;
+
+		Transform[] transforms = this.GetComponentsInChildren<Transform>();
 		foreach (Transform t in transforms) {
-			if (t.gameObject.name == "PlanetsHolder") {
-				planetsHolder = t.gameObject;
+			if (t.gameObject.name == name) {
+				generic = t.gameObject;
 				found = true;
 				break;
 			}
 		}
 		if (!found) {
-			planetsHolder = new GameObject();
-			planetsHolder.transform.parent = this.transform;
+			generic = new GameObject(name);
+			generic.transform.parent = this.transform;
 		}
+		return generic;
 	}
 
 	// Use this for initialization
@@ -186,7 +205,7 @@ public class Galaxy : MonoBehaviour {
 	void displayConnectedPlanets() {
 		for (int i=0; i<planetRows; i++) {
 			for (int j=0; j<planetColumns; j++) {
-				listOfPlanets[j,i].GetComponent<Planet>().displayTradeRoutes();
+				listOfPlanets[j,i].GetComponent<Planet>().displayTradeRoutes(tradeRouteHolder);
 			}
 		}
 	}

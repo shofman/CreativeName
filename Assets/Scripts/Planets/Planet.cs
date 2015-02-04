@@ -80,11 +80,9 @@ public class Planet : MonoBehaviour {
 			Destroy((GameObject)listOfRoutes[i]);
 			listOfRoutes.RemoveAt(i);
 		}
-
-		// displayTradeRoutes();
 	}
 
-	public void displayTradeRoutes() {
+	public void displayTradeRoutes(GameObject tradeRouterHolder) {
 		for (int i=listOfRoutes.Count-1; i >=0; i--) {
 			Destroy((GameObject)listOfRoutes[i]);
 			listOfRoutes.RemoveAt(i);
@@ -92,6 +90,7 @@ public class Planet : MonoBehaviour {
 
 		foreach(GameObject planet in connectedPlants) {
 			GameObject lineRenderer = (GameObject)Instantiate(tradeRoute);
+			lineRenderer.transform.parent = tradeRouterHolder.transform;
 			this.listOfRoutes.Add(lineRenderer);
 			Vector3 currPosition = gameObject.transform.position;
 			Vector3 targetPosition = planet.transform.position;
