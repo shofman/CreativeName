@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -19,9 +20,13 @@ public class Planet : MonoBehaviour {
 	List<GameObject> listOfRoutes;
 
 	public GameObject tradeRoute;
+	GameObject canvasUI;
+	GameObject textUI;
 	public float lineWidth;
 
 	void Awake() {
+		textUI = GameObject.Find("/PlanetMenu/Panel/BottomText");
+		canvasUI = GameObject.Find("/PlanetMenu");
 		connectedPlants = new List<GameObject>();
 		listOfRoutes = new List<GameObject>();
 	}
@@ -33,6 +38,7 @@ public class Planet : MonoBehaviour {
 		defense = random.Next (0, 100);
 		garrisons = random.Next (0, 100);
 		hasVisited = false;
+		canvasUI.SetActive(false);
 	}
 	
 	// Update is called once per frame
@@ -41,6 +47,11 @@ public class Planet : MonoBehaviour {
 			// Debug.Log(planetName);
 			// Debug.Log(printConnectedPlanets());
 		}
+	}
+
+	void OnMouseDown() {
+		textUI.GetComponent<PlanetDisplay>().setText(planetName);
+		canvasUI.SetActive(true);
 	}
 
 	public void addTradeRoute(GameObject planet) {
