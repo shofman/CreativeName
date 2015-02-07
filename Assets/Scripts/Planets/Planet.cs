@@ -13,16 +13,20 @@ public class Planet : MonoBehaviour {
 	int garrisons;
 	bool isRemoved = false;
 	bool hasVisited = false;
+	bool createdNameObject = false;
 	string planetName;
 	int galaxyPositionX = -1;
 	int galaxyPositionY = -1;
 	List<GameObject> connectedPlants;
 	List<GameObject> listOfRoutes;
 
+	public GameObject planetNameDisplay;
 	public GameObject tradeRoute;
+	public float lineWidth;
+	
 	GameObject canvasUI;
 	GameObject textUI;
-	public float lineWidth;
+	
 
 	void Awake() {
 		textUI = GameObject.Find("/PlanetMenu/Panel/BottomText");
@@ -39,6 +43,7 @@ public class Planet : MonoBehaviour {
 		garrisons = random.Next (0, 100);
 		hasVisited = false;
 		canvasUI.SetActive(false);
+		renderer.material.SetColor("_Color", Color.red);
 	}
 	
 	// Update is called once per frame
@@ -121,7 +126,19 @@ public class Planet : MonoBehaviour {
 	}
 
 	public void setName(string name) {
-		this.planetName = name; 
+		this.planetName = name;
+		if (!createdNameObject) {
+			createdNameObject = true;
+			GameObject nameDisplay = (GameObject) Instantiate(planetNameDisplay);
+			nameDisplay.transform.parent = this.transform;
+			nameDisplay.transform.position = this.transform.position;
+			// nameDisplay.transform.position -= new Vector3(0,1,0);
+			Vector3 temp = new Vector3(0.20f,0.60f, 0);
+			temp = new Vector3(2.3f,5,0);
+			nameDisplay.transform.position -= temp;
+			nameDisplay.GetComponent<TextMesh>().text = name;
+			nameDisplay.GetComponent<TextMesh>().fontSize = 20;
+		}
 	}
 
 	public void setPosition(int x, int y) {

@@ -58,7 +58,6 @@ public class Galaxy : MonoBehaviour {
 		for (int i=0; i<planetRows*planetColumns; i++) {
 			GameObject planetCreated = (GameObject)Instantiate(planet);
 			planetCreated.transform.parent = planetsHolder.transform;
-			planetCreated.GetComponent<Planet>().setName("" + i);
 			planetCreated.GetComponent<Planet>().setPosition(((i/planetRows)*20)-20, ((i%planetRows)*20)-20);
 			
 			// Ensure the name is at least 4 characters long (skip those that don't meet this criteria)
