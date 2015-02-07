@@ -122,7 +122,6 @@ public class Planet : MonoBehaviour {
 
 	public void setName(string name) {
 		this.planetName = name; 
-		this.GetComponent<TextMesh>().text = name;
 	}
 
 	public void setPosition(int x, int y) {
