@@ -54,12 +54,18 @@ public class Galaxy : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		listOfPlanets = new GameObject[planetColumns,planetRows];
+		int skippingIndex = 0;
 		for (int i=0; i<planetRows*planetColumns; i++) {
 			GameObject planetCreated = (GameObject)Instantiate(planet);
 			planetCreated.transform.parent = planetsHolder.transform;
 			planetCreated.GetComponent<Planet>().setName("" + i);
 			planetCreated.GetComponent<Planet>().setPosition(((i/planetRows)*20)-20, ((i%planetRows)*20)-20);
-			planetCreated.GetComponent<Planet>().setName(planetNames[i]);
+			
+			// Ensure the name is at least 4 characters long (skip those that don't meet this criteria)
+			while (planetNames[i+skippingIndex].Length < 4 && i+skippingIndex < planetNames.Count) {
+				skippingIndex++;
+			}
+			planetCreated.GetComponent<Planet>().setName(planetNames[i+skippingIndex]);
 			planetCreated.GetComponent<Planet>().setIndex(i/planetRows, i%planetRows);
 			listOfPlanets[i/planetRows,i%planetRows] = planetCreated;
 		}
