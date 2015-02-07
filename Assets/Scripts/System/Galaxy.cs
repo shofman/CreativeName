@@ -15,13 +15,17 @@ public class Galaxy : MonoBehaviour {
 	GameObject planetsHolder;
 	GameObject tradeRouteHolder;
 	List<string> planetNames;
+	System.Random random;
+
+	public int blueUnits = 20;
+	public int redUnits = 20;
 
 	void Awake() {
 		NameGenerator nameGenerator = new NameGenerator(3000);
-		// Dictionary<string, int> amounts = new Dictionary<string, int>();
 		planetNames = nameGenerator.generatePlanetNames();
 		planetsHolder = createPlanetHolder();
 		tradeRouteHolder = createTradeRouteHolder();
+		random = new System.Random();
 	}
 
 	GameObject createPlanetHolder() {
@@ -55,6 +59,10 @@ public class Galaxy : MonoBehaviour {
 	void Start () {
 		listOfPlanets = new GameObject[planetColumns,planetRows];
 		int skippingIndex = 0;
+
+		int totalBluePlanets = planetRows*planetColumns/2;
+		int totalRedPlanets = totalBluePlanets;
+		
 		for (int i=0; i<planetRows*planetColumns; i++) {
 			GameObject planetCreated = (GameObject)Instantiate(planet);
 			planetCreated.transform.parent = planetsHolder.transform;
@@ -67,6 +75,23 @@ public class Galaxy : MonoBehaviour {
 			planetCreated.GetComponent<Planet>().setName(planetNames[i+skippingIndex]);
 			planetCreated.GetComponent<Planet>().setIndex(i/planetRows, i%planetRows);
 			listOfPlanets[i/planetRows,i%planetRows] = planetCreated;
+
+			if (totalBluePlanets > 0 && totalRedPlanets > 0) {
+				int randomValue = random.Next(0,100);
+				if (randomValue < 50) {
+					planetCreated.GetComponent<Planet>().changeColorAndSetUnits(Color.blue, 2);
+					totalBluePlanets--;
+				} else {
+					planetCreated.GetComponent<Planet>().changeColorAndSetUnits(Color.red, 2);
+					totalRedPlanets--;
+				}
+			} else if (totalBluePlanets > 0) {
+				planetCreated.GetComponent<Planet>().changeColorAndSetUnits(Color.blue, 2);
+				totalBluePlanets--;
+			} else if (totalRedPlanets > 0) {
+				planetCreated.GetComponent<Planet>().changeColorAndSetUnits(Color.red, 2);
+				totalRedPlanets--;
+			}
 		}
 		connectAllPlanets();
 		removeConnections();
@@ -120,7 +145,6 @@ public class Galaxy : MonoBehaviour {
 		for (int i=0; i<planetRows; i++) {
 			for (int j=0; j<planetColumns; j++) {
 				List<GameObject> connectedPlanets = new List<GameObject>(listOfPlanets[j,i].GetComponent<Planet>().getConnectedPlanets());
-				System.Random random = new System.Random ();
 				foreach (GameObject planet in connectedPlanets) {
 					int randomValue = random.Next(0,100);
 					if (randomValue < 70) {
@@ -167,7 +191,6 @@ public class Galaxy : MonoBehaviour {
 
 	//Connect the planets together via trade routes
 	void connectPlanets() {
-		System.Random random = new System.Random ();
 		for (int i=0; i<planetRows; i++) {
 			for (int j=0; j<planetColumns; j++) {
 				//DIAGRAM TIME
@@ -253,11 +276,9 @@ public class Galaxy : MonoBehaviour {
 	}
 
 	void displayPlanetList(List<GameObject> listToDisplay) {
-		Debug.Log("LIST IS:");
 		foreach (GameObject g in listToDisplay) {
 			Debug.Log(g.GetComponent<Planet>().getName());
 		}
-		Debug.Log("LIST DONE");
 	}
 	
 	// Update is called once per frame

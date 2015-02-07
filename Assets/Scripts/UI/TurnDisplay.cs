@@ -3,11 +3,13 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public class PlanetDisplay : MonoBehaviour {
+public class TurnDisplay : MonoBehaviour {
 	Text txt;
+	int turnCount = 0;
 
 	void Awake() {
 		txt = gameObject.GetComponent<Text>();
+		updateCount();
 	}
 
 	// Use this for initialization
@@ -20,11 +22,8 @@ public class PlanetDisplay : MonoBehaviour {
 
 	}
 
-	public void setName(string name) {
-		txt.text = "Planet Name: " + name;
-	}
-
-	public void setGarrisons(int garrisons) {
-		txt.text = "Garrisons: " + garrisons;
+	public void updateCount() {
+		turnCount++;
+		txt.text = "Turn: " + turnCount;
 	}
 }

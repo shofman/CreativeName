@@ -2,8 +2,9 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
-public class Planet : MonoBehaviour {
+public class Planet : MonoBehaviour, IPointerClickHandler {
 	//Spice provides money, which buys troops every round
 	//Defense provides a defense bonus, 
 	//Garrisons provides the defense value, which must be beaten to determine victory
@@ -25,37 +26,36 @@ public class Planet : MonoBehaviour {
 	public float lineWidth;
 	
 	GameObject canvasUI;
-	GameObject textUI;
-	
+	GameObject planetInfo;
+	GameObject planetGarrison;
+	System.Random random;
 
 	void Awake() {
-		textUI = GameObject.Find("/PlanetMenu/Panel/BottomText");
+		planetInfo = GameObject.Find("/PlanetMenu/Panel/PlanetInfo");
+		planetGarrison = GameObject.Find("/PlanetMenu/Panel/PlanetGarrison");
 		canvasUI = GameObject.Find("/PlanetMenu");
 		connectedPlants = new List<GameObject>();
 		listOfRoutes = new List<GameObject>();
+		random = new System.Random ();
 	}
 
 	// Use this for initialization
 	void Start () {
-		System.Random random = new System.Random ();
 		spice = random.Next (0, 100);
 		defense = random.Next (0, 100);
-		garrisons = random.Next (0, 100);
 		hasVisited = false;
 		canvasUI.SetActive(false);
-		renderer.material.SetColor("_Color", Color.red);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if(Input.GetKeyDown("space")) {
-			// Debug.Log(planetName);
-			// Debug.Log(printConnectedPlanets());
 		}
 	}
 
-	void OnMouseDown() {
-		textUI.GetComponent<PlanetDisplay>().setText(planetName);
+	public void OnPointerClick(PointerEventData eventData) {
+		planetInfo.GetComponent<PlanetDisplay>().setName(planetName);
+		planetGarrison.GetComponent<PlanetDisplay>().setGarrisons(garrisons);
 		canvasUI.SetActive(true);
 	}
 
@@ -84,7 +84,6 @@ public class Planet : MonoBehaviour {
 	}
 
 	public void removeTradeRoute(int probability) {
-		System.Random random = new System.Random(); 
 		for (int i = connectedPlants.Count - 1; i >= 0; i--) {
 			int randomValue = random.Next(0,100);
 			if (randomValue < probability) {
@@ -132,13 +131,23 @@ public class Planet : MonoBehaviour {
 			GameObject nameDisplay = (GameObject) Instantiate(planetNameDisplay);
 			nameDisplay.transform.parent = this.transform;
 			nameDisplay.transform.position = this.transform.position;
-			// nameDisplay.transform.position -= new Vector3(0,1,0);
-			Vector3 temp = new Vector3(0.20f,0.60f, 0);
-			temp = new Vector3(2.3f,5,0);
-			nameDisplay.transform.position -= temp;
+			nameDisplay.transform.position -= new Vector3(2.3f,5,0);
 			nameDisplay.GetComponent<TextMesh>().text = name;
 			nameDisplay.GetComponent<TextMesh>().fontSize = 20;
 		}
+	}
+
+	public void changeColorAndSetUnits(Color color, int numberOfUnits) {
+		setUnits(numberOfUnits);
+		setToColor(color);
+	}
+
+	public void setUnits(int numberOfUnits) {
+		garrisons = numberOfUnits;
+	}
+
+	public void setToColor(Color c) {
+		renderer.material.SetColor("_Color", c);
 	}
 
 	public void setPosition(int x, int y) {
