@@ -5594,7 +5594,7 @@ public class NameGenerator {
 		return generate("", 8);
 	}
 
-	public List<string> generatePlanetNames() {
+	private List<GeneratedWordValue> generateNamesSortedByScore() {
 		List<GeneratedWordValue> generatedNamesAndScores = new List<GeneratedWordValue>();
 		for (int i=0; i<numberToGenerate; i++) {
 			generatedNamesAndScores.Add(new GeneratedWordValue(generate("", 8)));
@@ -5604,11 +5604,31 @@ public class NameGenerator {
 		List<GeneratedWordValue> generatedNamesAndScoresSorted = new List<GeneratedWordValue>();
 		generatedNamesAndScoresSorted.AddRange(generatedNamesAndScores.OrderByDescending(w=>w.score));
 
+		return generatedNamesAndScoresSorted;
+	}
+
+	public Queue<string> generatePlanetNamesAsQueue() {
+		List<GeneratedWordValue> namesSortedByScore = generateNamesSortedByScore();
+		Queue<string> sorted = new Queue<string>();
+		string previousWord = "";
+		foreach (GeneratedWordValue gwv in namesSortedByScore) {
+			// Ensure no duplicates for planet names in generated list (they should be sorted next to each other by scoring)
+			if (gwv.word != previousWord && gwv.word.Length > 4) {
+				previousWord = gwv.word;
+				sorted.Enqueue(uppercaseFirst(gwv.word));
+			}
+		}
+		return sorted;
+	}
+
+	public List<string> generatePlanetNames() {
+		List<GeneratedWordValue> namesSortedByScore = generateNamesSortedByScore();
+
 		List<string> sorted = new List<string>();
 		string previousWord = "";
-		foreach (GeneratedWordValue gwv in generatedNamesAndScoresSorted) {
+		foreach (GeneratedWordValue gwv in namesSortedByScore) {
 			// Ensure no duplicates for planet names in generated list (they should be sorted next to each other by scoring)
-			if (gwv.word != previousWord) {
+			if (gwv.word != previousWord && gwv.word.Length > 4) {
 				previousWord = gwv.word;
 				sorted.Add(uppercaseFirst(gwv.word));
 			}

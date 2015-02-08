@@ -20,9 +20,9 @@ public class Galaxy : MonoBehaviour {
 	public int blueUnits = 20;
 	public int redUnits = 20;
 
+	public string galaxyName = "";
+
 	void Awake() {
-		NameGenerator nameGenerator = new NameGenerator(3000);
-		planetNames = nameGenerator.generatePlanetNames();
 		planetsHolder = createPlanetHolder();
 		tradeRouteHolder = createTradeRouteHolder();
 		random = new System.Random();
@@ -55,8 +55,14 @@ public class Galaxy : MonoBehaviour {
 		return generic;
 	}
 
-	// Use this for initialization
-	void Start () {
+	public void createGalaxy(List<string> newPlanetNames) {
+		// NameGenerator nameGenerator = new NameGenerator(3000);
+		planetNames = newPlanetNames;
+
+		// Set galaxy name
+		galaxyName = planetNames[0];
+		planetNames.RemoveAt(0);
+
 		listOfPlanets = new GameObject[planetColumns,planetRows];
 		int skippingIndex = 0;
 
@@ -66,7 +72,9 @@ public class Galaxy : MonoBehaviour {
 		for (int i=0; i<planetRows*planetColumns; i++) {
 			GameObject planetCreated = (GameObject)Instantiate(planet);
 			planetCreated.transform.parent = planetsHolder.transform;
-			planetCreated.GetComponent<Planet>().setPosition(((i/planetRows)*20)-20, ((i%planetRows)*20)-20);
+			int xPos = ((i/planetRows)*20)-20 + (int) gameObject.transform.position.x;
+			int yPos = ((i%planetRows)*20)-20 + (int) gameObject.transform.position.y;
+			planetCreated.GetComponent<Planet>().setPosition(xPos, yPos);
 			
 			// Ensure the name is at least 4 characters long (skip those that don't meet this criteria)
 			while (planetNames[i+skippingIndex].Length < 4 && i+skippingIndex < planetNames.Count) {
@@ -101,6 +109,11 @@ public class Galaxy : MonoBehaviour {
 			}
 		}
 		displayConnectedPlanets();
+	}
+
+	// Use this for initialization
+	void Start () {
+		// createGalaxy();
 	}
 
 	bool addAdjacentConnection(int xAdjust, int yAdjust) {
