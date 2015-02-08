@@ -13,7 +13,8 @@ public class Universe : MonoBehaviour {
 	Queue<string> availableNames;
 
 	void Awake() {
-		NameGenerator nameGenerator = new NameGenerator(5000);
+		// 5000 seems to be alright
+		NameGenerator nameGenerator = new NameGenerator(numberOfGalaxies * 22);
 		availableNames = nameGenerator.generatePlanetNamesAsQueue();
 	}
 
