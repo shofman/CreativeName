@@ -8,7 +8,7 @@ public class Universe : MonoBehaviour {
 	public GameObject galaxy;
 	public int numberOfGalaxies;
 
-	GameObject[] listOfGalaxies;
+	GameObject[,] listOfGalaxies;
 	System.Random random;
 	Queue<string> availableNames;
 
@@ -39,16 +39,16 @@ public class Universe : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		listOfGalaxies = new GameObject[numberOfGalaxies];
+		listOfGalaxies = new GameObject[numberOfGalaxies,1];
 
-		for (int i=0; i<listOfGalaxies.Length; i++) {
+		for (int i=0; i<listOfGalaxies.GetLength(0); i++) {
 			GameObject galaxyCreated = (GameObject)Instantiate(galaxy);
 			galaxyCreated.transform.Translate(i*120, 0, 0);
 			Galaxy galaxyScript = galaxyCreated.GetComponent<Galaxy>();
 
 			// Each planet needs a name, plus the galaxy should be named
 			int totalNamesNeeded = (galaxyScript.planetRows * galaxyScript.planetColumns) + 1;
-			
+			galaxyScript.setIndex(i, 0);
 			// Transfer over the total needed amount to a new list
 			List<string> galaxyNames = new List<string>();
 			for (int j=0; j<totalNamesNeeded; j++) {
@@ -56,54 +56,27 @@ public class Universe : MonoBehaviour {
 			}
 
 			galaxyScript.createGalaxy(galaxyNames);
-			// galaxyCreated.transform.parent = planetsHolder.transform;
-			// galaxyCreated.GetComponent<Planet>().setPosition(((i/planetRows)*20)-20, ((i%planetRows)*20)-20);
-			
-			// galaxyCreated.GetComponent<Galaxy>().createGalaxy();
-			listOfGalaxies[i] = galaxyCreated;
+			listOfGalaxies[i,0] = galaxyCreated;
 
 		}
 		connectGalaxies();
 	}
 
 	void connectGalaxies() {
-
-	}
-
-	void addPlanet(GameObject planetToAdd, GameObject addedPlanet) {
-		Planet planetScript = planetToAdd.GetComponent<Planet>();
-		planetScript.addTradeRoute(addedPlanet);
-		Planet addedPlanetScript = addedPlanet.GetComponent<Planet>();
-		addedPlanetScript.addTradeRoute(planetToAdd);
-	}
-
-	void breadFirstSearchGalaxies(GameObject initialNode) {
-		Queue searchQueue = new Queue();
-		searchQueue.Enqueue(initialNode);
-
-		while (searchQueue.Count != 0) {
-			GameObject currPlanet = (GameObject) searchQueue.Dequeue();
-			string name = currPlanet.GetComponent<Planet>().getName();
-			//find the current index, use it to find the corresponding planet in the array, and set its visited status to true
-			int xPos = currPlanet.GetComponent<Planet>().getIndexForX();
-			int yPos = currPlanet.GetComponent<Planet>().getIndexForY();
-			// listOfPlanets[xPos,yPos].GetComponent<Planet>().setVisited(true);
-
-			List<GameObject> connectedPlanets = new List<GameObject>(currPlanet.GetComponent<Planet>().getConnectedPlanets());
-			// displayPlanetList(connectedPlanets);
-			for (int i=0; i<connectedPlanets.Count; i++) {
-				int x = connectedPlanets[i].GetComponent<Planet>().getIndexForX();
-				int y = connectedPlanets[i].GetComponent<Planet>().getIndexForY();
-				// if (!searchQueue.Contains(connectedPlanets[i]) && !listOfPlanets[x,y].GetComponent<Planet>().hasBeenVisited()) {
-				// 	searchQueue.Enqueue(connectedPlanets[i]);
-				// }
-			}
+		for (int i=1; i<listOfGalaxies.GetLength(0); i++) {
+			addGalaxy(listOfGalaxies[i,0], listOfGalaxies[i-1,0]);
 		}
+	}
+
+	void addGalaxy(GameObject galaxyToAdd, GameObject addedGalaxy) {
+		galaxyToAdd.GetComponent<Galaxy>().addGalacticRoute(addedGalaxy);
+		addedGalaxy.GetComponent<Galaxy>().addGalacticRoute(galaxyToAdd);
 	}
 
 	// Update is called once per frame
 	void Update () {
-		if(Input.GetKeyDown("a")) {
+		if(Input.GetKeyDown("b")) {
+			gameObject.GetComponent<BreadthFirstSearch>().breadthFirstSearchPlanets<Galaxy>(listOfGalaxies[2,0], listOfGalaxies, true);
 		}
 	}
 }

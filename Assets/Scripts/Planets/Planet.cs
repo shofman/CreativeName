@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 
-public class Planet : MonoBehaviour, IPointerClickHandler {
+public class Planet : MonoBehaviour, IPointerClickHandler, IBreadthFirstSearchInterface {
 	//Spice provides money, which buys troops every round
 	//Defense provides a defense bonus, 
 	//Garrisons provides the defense value, which must be beaten to determine victory
@@ -18,7 +18,7 @@ public class Planet : MonoBehaviour, IPointerClickHandler {
 	string planetName;
 	int galaxyPositionX = -1;
 	int galaxyPositionY = -1;
-	List<GameObject> connectedPlants;
+	List<GameObject> connectedPlanets;
 	List<GameObject> listOfRoutes;
 
 	public GameObject planetNameDisplay;
@@ -34,7 +34,7 @@ public class Planet : MonoBehaviour, IPointerClickHandler {
 		planetInfo = GameObject.Find("/PlanetMenu/Panel/PlanetInfo");
 		planetGarrison = GameObject.Find("/PlanetMenu/Panel/PlanetGarrison");
 		canvasUI = GameObject.Find("/PlanetMenu");
-		connectedPlants = new List<GameObject>();
+		connectedPlanets = new List<GameObject>();
 		listOfRoutes = new List<GameObject>();
 		random = new System.Random ();
 	}
@@ -60,15 +60,15 @@ public class Planet : MonoBehaviour, IPointerClickHandler {
 	}
 
 	public void addTradeRoute(GameObject planet) {
-		this.connectedPlants.Add(planet);
+		this.connectedPlanets.Add(planet);
 	}
 
-	public List<GameObject> getConnectedPlanets() {
-		return this.connectedPlants;
+	public List<GameObject> getConnectedObjects() {
+		return this.connectedPlanets;
 	}
 
 	public void removeConnectedPlanet(GameObject planet) {
-		connectedPlants.Remove(planet);
+		connectedPlanets.Remove(planet);
 		for (int i=listOfRoutes.Count-1; i >=0; i--) {
 			Destroy((GameObject)listOfRoutes[i]);
 			listOfRoutes.RemoveAt(i);
@@ -77,17 +77,17 @@ public class Planet : MonoBehaviour, IPointerClickHandler {
 
 	public string printConnectedPlanets() {
 		string output = "";
-		foreach (GameObject planet in connectedPlants) {
+		foreach (GameObject planet in connectedPlanets) {
 			output += planet.GetComponent<Planet>().getName() + " - ";
 		}
 		return output;
 	}
 
 	public void removeTradeRoute(int probability) {
-		for (int i = connectedPlants.Count - 1; i >= 0; i--) {
+		for (int i = connectedPlanets.Count - 1; i >= 0; i--) {
 			int randomValue = random.Next(0,100);
 			if (randomValue < probability) {
-				connectedPlants.RemoveAt(i);
+				connectedPlanets.RemoveAt(i);
 			}
 		}
 
@@ -103,7 +103,7 @@ public class Planet : MonoBehaviour, IPointerClickHandler {
 			listOfRoutes.RemoveAt(i);
 		}
 
-		foreach(GameObject planet in connectedPlants) {
+		foreach(GameObject planet in connectedPlanets) {
 			GameObject lineRenderer = (GameObject)Instantiate(tradeRoute);
 			lineRenderer.transform.parent = tradeRouterHolder.transform;
 			this.listOfRoutes.Add(lineRenderer);

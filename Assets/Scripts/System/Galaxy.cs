@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System;
 
 
-public class Galaxy : MonoBehaviour {
+public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
 	public GameObject planet;
 	public int planetRows;
 	public int planetColumns;
@@ -17,23 +17,23 @@ public class Galaxy : MonoBehaviour {
 	List<string> planetNames;
 	System.Random random;
 
+	List<GameObject> connectedGalaxies;
+
+	bool hasVisited = false;
+	public string galaxyName = "SAMPLE";
+	int universePositionX = -1;
+	int universePositionY = -1;
+
 	public int blueUnits = 20;
 	public int redUnits = 20;
 
-	public string galaxyName = "";
+	
 
 	void Awake() {
-		planetsHolder = createPlanetHolder();
-		tradeRouteHolder = createTradeRouteHolder();
+		planetsHolder = createEmptyGameObject("PlanetsHolder");
+		tradeRouteHolder = createEmptyGameObject(TRADE_ROUTE_HOLDER);
 		random = new System.Random();
-	}
-
-	GameObject createPlanetHolder() {
-		return createEmptyGameObject("PlanetsHolder");
-	}
-
-	GameObject createTradeRouteHolder() {
-		return createEmptyGameObject(TRADE_ROUTE_HOLDER);
+		connectedGalaxies = new List<GameObject>();
 	}
 
 	GameObject createEmptyGameObject(string name) {
@@ -56,7 +56,6 @@ public class Galaxy : MonoBehaviour {
 	}
 
 	public void createGalaxy(List<string> newPlanetNames) {
-		// NameGenerator nameGenerator = new NameGenerator(3000);
 		planetNames = newPlanetNames;
 
 		// Set galaxy name
@@ -64,7 +63,6 @@ public class Galaxy : MonoBehaviour {
 		planetNames.RemoveAt(0);
 
 		listOfPlanets = new GameObject[planetColumns,planetRows];
-		int skippingIndex = 0;
 
 		int totalBluePlanets = planetRows*planetColumns/2;
 		int totalRedPlanets = totalBluePlanets;
@@ -76,11 +74,7 @@ public class Galaxy : MonoBehaviour {
 			int yPos = ((i%planetRows)*20)-20 + (int) gameObject.transform.position.y;
 			planetCreated.GetComponent<Planet>().setPosition(xPos, yPos);
 			
-			// Ensure the name is at least 4 characters long (skip those that don't meet this criteria)
-			while (planetNames[i+skippingIndex].Length < 4 && i+skippingIndex < planetNames.Count) {
-				skippingIndex++;
-			}
-			planetCreated.GetComponent<Planet>().setName(planetNames[i+skippingIndex]);
+			planetCreated.GetComponent<Planet>().setName(planetNames[i]);
 			planetCreated.GetComponent<Planet>().setIndex(i/planetRows, i%planetRows);
 			listOfPlanets[i/planetRows,i%planetRows] = planetCreated;
 
@@ -113,7 +107,6 @@ public class Galaxy : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		// createGalaxy();
 	}
 
 	bool addAdjacentConnection(int xAdjust, int yAdjust) {
@@ -157,7 +150,7 @@ public class Galaxy : MonoBehaviour {
 	void removeConnections() {
 		for (int i=0; i<planetRows; i++) {
 			for (int j=0; j<planetColumns; j++) {
-				List<GameObject> connectedPlanets = new List<GameObject>(listOfPlanets[j,i].GetComponent<Planet>().getConnectedPlanets());
+				List<GameObject> connectedPlanets = new List<GameObject>(listOfPlanets[j,i].GetComponent<Planet>().getConnectedObjects());
 				foreach (GameObject planet in connectedPlanets) {
 					int randomValue = random.Next(0,100);
 					if (randomValue < 70) {
@@ -173,7 +166,8 @@ public class Galaxy : MonoBehaviour {
 						}
 
 						//Check to see if we are still connected
-						breadFirstSearchPlanets(listOfPlanets[j,i]);
+						gameObject.GetComponent<BreadthFirstSearch>().breadthFirstSearchPlanets<Planet>(listOfPlanets[j,i], listOfPlanets, false);
+
 						for (int a=0; a<listOfPlanets.GetLength(0); a++) {
 							for (int b=0; b<listOfPlanets.GetLength(1); b++) {
 								if (!listOfPlanets[a,b].GetComponent<Planet>().hasBeenRemoved() && !listOfPlanets[a,b].GetComponent<Planet>().hasBeenVisited()) {
@@ -234,7 +228,7 @@ public class Galaxy : MonoBehaviour {
 	}
 
 	void removeEdgelessPlanets(GameObject planet) {
-		List<GameObject> connectedPlanets = new List<GameObject>(planet.GetComponent<Planet>().getConnectedPlanets());
+		List<GameObject> connectedPlanets = new List<GameObject>(planet.GetComponent<Planet>().getConnectedObjects());
 		if (connectedPlanets.Count == 0) {
 			int xPos = planet.GetComponent<Planet>().getIndexForX();
 			int yPos = planet.GetComponent<Planet>().getIndexForY();
@@ -258,36 +252,6 @@ public class Galaxy : MonoBehaviour {
 		addedPlanetScript.addTradeRoute(planetToAdd);
 	}
 
-	void breadFirstSearchPlanets(GameObject initialNode) {
-		Queue searchQueue = new Queue();
-		searchQueue.Enqueue(initialNode);
-
-		for (int i=0; i<listOfPlanets.GetLength(0); i++) {
-			for (int j=0; j<listOfPlanets.GetLength(1); j++) {
-				listOfPlanets[i,j].GetComponent<Planet>().setVisited(false);
-			}
-		}
-
-		while (searchQueue.Count != 0) {
-			GameObject currPlanet = (GameObject) searchQueue.Dequeue();
-			string name = currPlanet.GetComponent<Planet>().getName();
-			//find the current index, use it to find the corresponding planet in the array, and set its visited status to true
-			int xPos = currPlanet.GetComponent<Planet>().getIndexForX();
-			int yPos = currPlanet.GetComponent<Planet>().getIndexForY();
-			listOfPlanets[xPos,yPos].GetComponent<Planet>().setVisited(true);
-
-			List<GameObject> connectedPlanets = new List<GameObject>(currPlanet.GetComponent<Planet>().getConnectedPlanets());
-			// displayPlanetList(connectedPlanets);
-			for (int i=0; i<connectedPlanets.Count; i++) {
-				int x = connectedPlanets[i].GetComponent<Planet>().getIndexForX();
-				int y = connectedPlanets[i].GetComponent<Planet>().getIndexForY();
-				if (!searchQueue.Contains(connectedPlanets[i]) && !listOfPlanets[x,y].GetComponent<Planet>().hasBeenVisited()) {
-					searchQueue.Enqueue(connectedPlanets[i]);
-				}
-			}
-		}
-	}
-
 	void displayPlanetList(List<GameObject> listToDisplay) {
 		foreach (GameObject g in listToDisplay) {
 			Debug.Log(g.GetComponent<Planet>().getName());
@@ -297,7 +261,36 @@ public class Galaxy : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if(Input.GetKeyDown("a")) {
-			breadFirstSearchPlanets(listOfPlanets[2,2]);
+			gameObject.GetComponent<BreadthFirstSearch>().breadthFirstSearchPlanets<Planet>(listOfPlanets[2,2], listOfPlanets, true);
 		}
 	}
+
+	public void addGalacticRoute(GameObject galaxy) {
+		this.connectedGalaxies.Add(galaxy);
+	}
+
+	// Breadth first search
+	public bool hasBeenVisited() {
+		return hasVisited;
+	}
+	public void setVisited(bool visited) {
+		hasVisited = visited;
+	}
+	public void setIndex(int xPos, int yPos) {
+		universePositionX = xPos;
+		universePositionY = yPos;
+	}
+	public int getIndexForX() {
+		return universePositionX;
+	}
+	public int getIndexForY() {
+		return universePositionY;
+	}
+	public string getName() {
+		return galaxyName;
+	}
+	public List<GameObject> getConnectedObjects() {
+		return this.connectedGalaxies;
+	}
+
 }
