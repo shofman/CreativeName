@@ -229,37 +229,6 @@ public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
 		}
 	}
 
-	//Connect the planets together via trade routes
-	void connectPlanets() {
-		for (int i=0; i<planetRows; i++) {
-			for (int j=0; j<planetColumns; j++) {
-				//DIAGRAM TIME
-				// 0 0 0 -> x is the node to check
-				// 0 x y -> y are the nodes we are joining to
-				// y y y -> 0 are the nodes we skip (because they have already joined)
-				if (j+1 < planetColumns) {
-					int randomValue = random.Next(0,100);
-					if (randomValue < 0) {
-						addPlanet(listOfPlanets[j,i], listOfPlanets[j+1,i]);
-					}
-				}
-				if (i+1 < planetRows) {
-					// for (int k=-1; k<2; k++) {
-					for (int k=0; k<1; k++) {
-						if (j+k > -1 && j+k < planetColumns) {
-							int lowerRandomValue = random.Next(0,100);
-							if (j == 0 || j == 2) {
-							// if (lowerRandomValue < 25) {
-								addPlanet(listOfPlanets[j+k,i+1], listOfPlanets[j,i]);
-							}
-						}
-					}
-				}
-				
-			}
-		}
-	}
-
 	/**
 	 * Removes all planets that do not have any trade routes leading to them
 	 * @param  GameObject planet - the current planet we are investigating
@@ -311,6 +280,8 @@ public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
 	void Update () {
 		if(Input.GetKeyDown("a")) {
 			gameObject.GetComponent<BreadthFirstSearch>().breadthFirstSearchPlanets<Planet>(listOfPlanets[2,2], listOfPlanets, true);
+		} else if (Input.GetKeyDown("c")) {
+			listOfPlanets[0,0].GetComponent<PlanetProduction>().createShip();
 		}
 	}
 

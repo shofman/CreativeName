@@ -1,0 +1,5 @@
+Rules To Implement
+------------------
+
+Limit amount of people that can be hired from planet
+Artifacts within galaxy (gives bonus if entire galaxy is controlled, but will be the focal point of invasion)

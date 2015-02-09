@@ -581,7 +581,7 @@ public class NameGenerator {
 
 	//Groups of letters that are possible to appear, but that shouldn"t finish off a name
 	string[] wordsToAvoidAtEnd = new string[] {
-		"dri","li","sc","ixi","dr","ae","dla","bhe","bf","edl","kr","xo","vei","aiv","gr","sv","fha","sci","dl","dr","vb","nn","blu","eex","rrd","ji","gg","eew","whe","ecl","itl","dg","cb", "rw", "cr","fr"
+		"dri","li","sc","ixi","dr","ae","dla","bhe","bf","edl","kr","xo","vei","aiv","gr","sv","fha","sci","dl","dr","vb","nn","blu","eex","rrd","ji","gg","eew","whe","ecl","itl","dg","cb", "rw", "cr","fr","kl"
 	};
 
 	Dictionary<string, List<DigramValue>> digramWordFreq = new Dictionary<string, List<DigramValue>>() {
