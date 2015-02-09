@@ -5473,7 +5473,7 @@ public class NameGenerator {
 			//Calculate new probabilities that sum to one
 			double total = 0;
 			List<double> newWeightings = new List<double>();
-			foreach (DigramValue digram in sorted) {
+			for (int i=0; i<sorted.Count; i++) {
 				double randomValue = random.NextDouble();
 				total += randomValue;
 				newWeightings.Add(randomValue);

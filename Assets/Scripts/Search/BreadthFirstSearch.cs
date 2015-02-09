@@ -5,6 +5,14 @@ using System;
 
 public class BreadthFirstSearch : MonoBehaviour {
 
+	/**
+	 * Perform a breadth first search on the type T
+	 * T - The gameobject we want to perform the bfs on
+	 * @type gameObject
+	 * @param initialNode - starting node for the search
+	 * @param Array representing the graph we are performing the search throughout
+	 * @param displayNames - boolean for displaying the name as we perform the search
+	 */
 	public void breadthFirstSearchPlanets <T> (GameObject initialNode, GameObject[,] listOfPlanets, bool displayNames) where T : Component, IBreadthFirstSearchInterface {
 		Queue searchQueue = new Queue();
 		searchQueue.Enqueue(initialNode);

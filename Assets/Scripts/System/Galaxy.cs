@@ -1,34 +1,58 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System;
 
 
 public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
+	// The planet object
 	public GameObject planet;
+
+	//UI element that will display the name of the galaxy
+	public GameObject galaxyNameUI;
+
+	//Number of planets in terms of rows and columns
 	public int planetRows;
 	public int planetColumns;
 
+	//Name of the object that houses the trade routes for this galaxy
 	public const string TRADE_ROUTE_HOLDER = "TradeRouterHolder"; 
 
+	// List of planets within this galaxy
 	GameObject[,] listOfPlanets;
+
+	// Empty game object to hold collections of gameobjects
 	GameObject planetsHolder;
 	GameObject tradeRouteHolder;
+
+	// List of potential planet names for this galaxy
 	List<string> planetNames;
+
+	// Random number generator
 	System.Random random;
 
+	// List of all connected galaxies to this particular galaxy
 	List<GameObject> connectedGalaxies;
 
+	// Whether we have visited this galaxy before (for searches)
 	bool hasVisited = false;
-	public string galaxyName = "SAMPLE";
+
+	// The name of this galaxy
+	public string galaxyName = "";
+
+	//Initial position in global array holding position
 	int universePositionX = -1;
 	int universePositionY = -1;
 
+	// Total number of units used per galaxy
 	public int blueUnits = 20;
 	public int redUnits = 20;
 
 	
-
+	/**
+	 * On intialization, create necessary child gameobjects, setup random generator, and initialize required variables
+	 */
 	void Awake() {
 		planetsHolder = createEmptyGameObject("PlanetsHolder");
 		tradeRouteHolder = createEmptyGameObject(TRADE_ROUTE_HOLDER);
@@ -36,6 +60,11 @@ public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
 		connectedGalaxies = new List<GameObject>();
 	}
 
+	/**
+	 * Finds a game object of the children with a particular name, or creates it
+	 * @param name - The name of the parent gameobject we are wanting to find the game object
+	 * @return GameObject - created or found game object with the given name
+	 */
 	GameObject createEmptyGameObject(string name) {
 		GameObject generic = null;
 		bool found = false;
@@ -55,10 +84,17 @@ public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
 		return generic;
 	}
 
+	/**
+	 * Responsible for setting up and creating the planets in a particular galaxy
+	 *     * Will position them in grid
+	 *     * Sets colors to either red or blue
+	 *     * Creates random connected graph based on available nodes
+	 * @param newPlanetNames - List of randomly generated planet names
+	 */
 	public void createGalaxy(List<string> newPlanetNames) {
 		planetNames = newPlanetNames;
 
-		// Set galaxy name
+		// Set galaxy name first, and remove it from list (no duplicates)
 		galaxyName = planetNames[0];
 		planetNames.RemoveAt(0);
 
@@ -105,31 +141,25 @@ public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
 		displayConnectedPlanets();
 	}
 
+	/**
+	 * Create the UI display for the particular galaxy 
+	 * @param  GameObject - The canvas that houses the UI elements for displaying the galaxy info
+	 */
+	public void createGalaxyUIElements(GameObject canvasDisplay) {
+		GameObject galaxyUI = (GameObject) Instantiate(galaxyNameUI);
+		galaxyUI.transform.SetParent(canvasDisplay.transform, false);
+		galaxyUI.transform.Translate(gameObject.transform.position.x, gameObject.transform.position.y, 0);
+		galaxyUI.SetActive(false);
+		canvasDisplay.GetComponent<GalaxyDisplay>().addGalaxyDisplay(galaxyUI, getName());
+	}
+
 	// Use this for initialization
 	void Start () {
 	}
 
-	bool addAdjacentConnection(int xAdjust, int yAdjust) {
-		bool added = false;
-		for (int i=-1; i<2; i++) {
-			for (int j=-1; j<2; j++) {
-				if (j+xAdjust < planetColumns && j+xAdjust >= 0) {
-					if (i+yAdjust <planetRows && i+yAdjust >= 0) {
-						if (listOfPlanets[j+xAdjust,i+yAdjust].GetComponent<Planet>().hasBeenVisited() && !added) {
-							addPlanet(listOfPlanets[j+xAdjust,i+yAdjust], listOfPlanets[xAdjust,yAdjust]);
-							added = true;
-						}
-					}
-				}
-			}
-		}
-		return added;
-	}
-
-	public char mapName(int count) {
-		return (char) (count + 65);
-	}
-
+	/**
+	 * Connects every planet within a galaxy to its neighbors
+	 */
 	void connectAllPlanets() {
 		for (int i=0; i<planetRows; i++) {
 			for (int j=0; j<planetColumns; j++) {
@@ -147,6 +177,9 @@ public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
 		}
 	}
 
+	/**
+	 * Randomly remove the trade routes between planets
+	 */
 	void removeConnections() {
 		for (int i=0; i<planetRows; i++) {
 			for (int j=0; j<planetColumns; j++) {
@@ -227,6 +260,10 @@ public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
 		}
 	}
 
+	/**
+	 * Removes all planets that do not have any trade routes leading to them
+	 * @param  GameObject planet - the current planet we are investigating
+	 */
 	void removeEdgelessPlanets(GameObject planet) {
 		List<GameObject> connectedPlanets = new List<GameObject>(planet.GetComponent<Planet>().getConnectedObjects());
 		if (connectedPlanets.Count == 0) {
@@ -237,6 +274,9 @@ public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
 		}
 	}
 
+	/**
+	 * Display the connections between the planets as line renderers
+	 */
 	void displayConnectedPlanets() {
 		for (int i=0; i<planetRows; i++) {
 			for (int j=0; j<planetColumns; j++) {
@@ -245,6 +285,11 @@ public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
 		}
 	}
 
+	/**
+	 * Add the planetary connection between the two planets at the planet level (two-way link)
+	 * @param The first planet we are connecting to 
+	 * @param The second planet we are connecting to
+	 */
 	void addPlanet(GameObject planetToAdd, GameObject addedPlanet) {
 		Planet planetScript = planetToAdd.GetComponent<Planet>();
 		planetScript.addTradeRoute(addedPlanet);
@@ -252,6 +297,10 @@ public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
 		addedPlanetScript.addTradeRoute(planetToAdd);
 	}
 
+	/**
+	 * Display the planet names within a galaxy
+	 * @param  The list of planets we want to display
+	 */
 	void displayPlanetList(List<GameObject> listToDisplay) {
 		foreach (GameObject g in listToDisplay) {
 			Debug.Log(g.GetComponent<Planet>().getName());
@@ -265,30 +314,69 @@ public class Galaxy : MonoBehaviour, IBreadthFirstSearchInterface {
 		}
 	}
 
+	/**
+	 * Add which galaxies this particular galaxy is connected to
+	 * @param GameObject galaxy - the galaxy we want to connect this to
+	 */
 	public void addGalacticRoute(GameObject galaxy) {
 		this.connectedGalaxies.Add(galaxy);
 	}
 
-	// Breadth first search
+	// BREADTH FIRST SEARCH VARIABLES
+	/**
+	 * Whether or not we have been visited during a breadth first search
+	 * @return If we have already visited this galaxy during a search
+	 */
 	public bool hasBeenVisited() {
 		return hasVisited;
 	}
+
+	/**
+	 * Sets whether we have visited the planet or not
+	 * @param bool visited - whether we have visited the galaxy before
+	 */
 	public void setVisited(bool visited) {
 		hasVisited = visited;
 	}
+
+	/**
+	 * Sets the indices within the parent array (in this case, universe) for easy access during search
+	 * @param int xPos - The first parameter in the two dimensional array this value is stored within in the parent array
+	 * @param int yPos - The second parameter in the two dimensional array this value is stored within in the parent array
+	 */
 	public void setIndex(int xPos, int yPos) {
 		universePositionX = xPos;
 		universePositionY = yPos;
 	}
+
+	/**
+	 * Returns the first index for accessing this value in the storage two-dimensional array in the parent
+	 * @return int - the position this value is in within the parent array
+	 */
 	public int getIndexForX() {
 		return universePositionX;
 	}
+
+	/**
+	 * Returns the second index for accessing this value in the storage two-dimensional array in the parent
+	 * @return int - the position this value is in within the parent array
+	 */
 	public int getIndexForY() {
 		return universePositionY;
 	}
+
+	/**
+	 * Returns the name of this galaxy
+	 * @return string 
+	 */
 	public string getName() {
 		return galaxyName;
 	}
+
+	/**
+	 * Returns the number of galaxies this function is connected to 
+	 * @return List<GameObject> a list of all connected galaxies to this galaxy
+	 */
 	public List<GameObject> getConnectedObjects() {
 		return this.connectedGalaxies;
 	}

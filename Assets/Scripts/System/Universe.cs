@@ -12,10 +12,14 @@ public class Universe : MonoBehaviour {
 	System.Random random;
 	Queue<string> availableNames;
 
+	GameObject canvasUI;
+
 	void Awake() {
 		// 5000 seems to be alright
 		NameGenerator nameGenerator = new NameGenerator(numberOfGalaxies * 22);
 		availableNames = nameGenerator.generatePlanetNamesAsQueue();
+
+		canvasUI = GameObject.Find("/UniverseDisplay");
 	}
 
 	GameObject createEmptyGameObject(string name) {
@@ -56,6 +60,7 @@ public class Universe : MonoBehaviour {
 			}
 
 			galaxyScript.createGalaxy(galaxyNames);
+			galaxyScript.createGalaxyUIElements(canvasUI);
 			listOfGalaxies[i,0] = galaxyCreated;
 
 		}
