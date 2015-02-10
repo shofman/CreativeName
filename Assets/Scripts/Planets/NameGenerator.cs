@@ -6,7 +6,9 @@ using UnityEngine;
 
 public class NameGenerator {
 
-	//Representation of digrams and their respective frequency
+	/**
+	 * Class that represents a pairing of digrams and their respective frequency
+	 */
 	public class DigramValue {
 		public string digram;
 		public double frequency;
@@ -20,6 +22,9 @@ public class NameGenerator {
 		}
 	}
 
+	/**
+	 * Class that represents a pairing between a generated word and its score (how closely it resembles normal English words)
+	 */
 	public class GeneratedWordValue {
 		public string word;
 		public double score;
@@ -584,6 +589,10 @@ public class NameGenerator {
 		"dri","li","sc","ixi","dr","ae","dla","bhe","bf","edl","kr","xo","vei","aiv","gr","sv","fha","sci","dl","dr","vb","nn","blu","eex","rrd","ji","gg","eew","whe","ecl","itl","dg","cb", "rw", "cr","fr","kl"
 	};
 
+	/**
+	 * How frequently particular digrams appears in the English language
+	 * @type {Dictionary}
+	 */
 	Dictionary<string, List<DigramValue>> digramWordFreq = new Dictionary<string, List<DigramValue>>() {
 		{
 			"ab", 
@@ -5458,9 +5467,12 @@ public class NameGenerator {
 		}
 	};
 
+	/**
+	 * Creates a new name generator
+	 * @param int - the amount of planets we want to generate
+	 */
 	public NameGenerator(int numberOfPlanets) {
-		numberToGenerate = numberOfPlanets;
-		
+		numberToGenerate = numberOfPlanets;		
 	}
 
 	private Dictionary<string, List<DigramValue>> sortWordFreq(Dictionary<string, List<DigramValue>> wordFreq) {
@@ -5503,6 +5515,13 @@ public class NameGenerator {
 		return newWordFreq;
 	}
 
+	/**
+	 * Checks the end of the word for certain phrases to avoid and trims it off
+	 * If the word becomes too small, we kickoff another generation with the remaining word as a seed
+	 * @param  string - the initial generated word we are checking
+	 * @param  int - the max length that a string can be (used in regenerating the word)
+	 * @return string - a sanitized randomly generated word
+	 */
 	private string checkEndWord(string generatedWord, int maxLength) {
 		bool found = false;
 		foreach (string word in wordsToAvoidAtEnd) {
@@ -5524,6 +5543,12 @@ public class NameGenerator {
 		return generatedWord;
 	}
 
+	/**
+	 * Generates a word based off an initial value, and a maximum length of characters
+	 * @param  string - the initial string we want to use as a basis
+	 * @param  int - The maximum length of a particular word
+	 * @return string - a newly generated random word
+	 */
 	private string generate(string initialSeed, int maxLength) {
 		if (initialSeed.Length == 0) {
 			initialSeed = generateSeed();
@@ -5548,6 +5573,10 @@ public class NameGenerator {
 		return initialSeed;
 	}
 
+	/**
+	 * Creates a random starting point to base our word off of
+	 * @return string - A digram to generate a word from
+	 */
 	private string generateSeed() {
 		List<string> keyList = new List<string>(digramWordFreq.Keys);
 		string randomKey = keyList[random.Next(keyList.Count)];
@@ -5557,6 +5586,11 @@ public class NameGenerator {
 		return randomKey;
 	}
 
+	/**
+	 * Finds a random digram from the list of available diagrams
+	 * @param  A list of digrams that we can choose form
+	 * @return string - the following character of a digram (i.e. returns I from KI or A from PA)
+	 */
 	private string getRandomDigram(List<DigramValue> listOfPossibleDigrams) {
 		double probability = random.NextDouble();
 		foreach (DigramValue digramVal in listOfPossibleDigrams) {
@@ -5569,6 +5603,12 @@ public class NameGenerator {
 		return listOfPossibleDigrams.ElementAt(listOfPossibleDigrams.Count-1).digram.Substring(1,1);
 	}
 
+	/**
+	 * Takes the first letter of a string and converts its to upper case
+	 * e.g. test becomes Test
+	 * @param  string - the string we want to uppercase
+	 * @return string - an uppercased version of the string 
+	 */
 	private string uppercaseFirst(string s) {
 		if (string.IsNullOrEmpty(s))
 		{
@@ -5579,6 +5619,12 @@ public class NameGenerator {
 		return new string(a);
 	}
 
+	/**
+	 * Takes a list of digram probablities and computes a score for a particular word
+	 * to see how well it fits into the English language (higher score is better)
+	 * @param  string - the word we want to evaluate
+	 * @return double - the score of how similar the word is to other English language words
+	 */
 	private double evaluateWordBasedOnDigrams(string word) {
 		double total = 1.0;
 		for (int i=1; i<word.Length; i++) {
@@ -5590,10 +5636,18 @@ public class NameGenerator {
 		return total;
 	}
 
+	/**
+	 * Generates a random planet name (by default 8 characters)
+	 * @return string - a newly random generated word
+	 */
 	public string generatePlanetName() {
 		return generate("", 8);
 	}
 
+	/**
+	 * Generates a (numberToGenerate) amount of random names, and sorts them by their relative score
+	 * @return A sorted list of randomly generated names
+	 */
 	private List<GeneratedWordValue> generateNamesSortedByScore() {
 		List<GeneratedWordValue> generatedNamesAndScores = new List<GeneratedWordValue>();
 		for (int i=0; i<numberToGenerate; i++) {
@@ -5606,7 +5660,12 @@ public class NameGenerator {
 
 		return generatedNamesAndScoresSorted;
 	}
-
+	
+	/**
+	 * Generates a set number of planet names, sorted them by score, and returns a list ordered by the words most similar to English
+	 * @see generatePlanetNames()
+	 * @return Queue - queue of randomly generated names 
+	 */
 	public Queue<string> generatePlanetNamesAsQueue() {
 		List<GeneratedWordValue> namesSortedByScore = generateNamesSortedByScore();
 		Queue<string> sorted = new Queue<string>();
@@ -5621,6 +5680,11 @@ public class NameGenerator {
 		return sorted;
 	}
 
+	/**
+	 * Generates a set number of planet names, sorted them by score, and returns a list ordered by the words most similar to English
+	 * Removes duplicates and words that happen to be under four characters
+	 * @return List - list of randomly generated names
+	 */
 	public List<string> generatePlanetNames() {
 		List<GeneratedWordValue> namesSortedByScore = generateNamesSortedByScore();
 
