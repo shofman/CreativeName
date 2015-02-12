@@ -12,14 +12,16 @@ public class Universe : MonoBehaviour {
 	System.Random random;
 	Queue<string> availableNames;
 
-	GameObject canvasUI;
+	GameObject universeUI;
+	GameObject planetMenuDisplay;
 
 	void Awake() {
 		// 5000 seems to be alright
 		NameGenerator nameGenerator = new NameGenerator(numberOfGalaxies * 22);
 		availableNames = nameGenerator.generatePlanetNamesAsQueue();
 
-		canvasUI = GameObject.Find("/UniverseDisplay");
+		universeUI = GameObject.Find("/UniverseDisplay");
+		planetMenuDisplay = GameObject.Find("/PlanetMenu");
 	}
 
 	GameObject createEmptyGameObject(string name) {
@@ -60,11 +62,14 @@ public class Universe : MonoBehaviour {
 			}
 
 			galaxyScript.createGalaxy(galaxyNames);
-			galaxyScript.createGalaxyUIElements(canvasUI);
+			galaxyScript.createGalaxyUIElements(universeUI);
 			listOfGalaxies[i,0] = galaxyCreated;
 
 		}
 		connectGalaxies();
+
+		// Disable the planet menu
+		planetMenuDisplay.SetActive(false);
 	}
 
 	void connectGalaxies() {

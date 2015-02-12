@@ -46,7 +46,6 @@ public class Planet : MonoBehaviour, IPointerClickHandler, IBreadthFirstSearchIn
 		spice = random.Next (0, 100);
 		defense = random.Next (0, 100);
 		hasVisited = false;
-		canvasUI.SetActive(false);
 	}
 	
 	// Update is called once per frame
