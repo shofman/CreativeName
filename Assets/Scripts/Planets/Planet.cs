@@ -28,12 +28,14 @@ public class Planet : MonoBehaviour, IPointerClickHandler, IBreadthFirstSearchIn
 	GameObject canvasUI;
 	GameObject planetInfo;
 	GameObject planetGarrison;
+	GameObject planetShipButton;
 	GameObject fleetOverPlanet;
 	System.Random random;
 
 	void Awake() {
 		planetInfo = GameObject.Find("/PlanetMenu/Panel/PlanetInfo");
 		planetGarrison = GameObject.Find("/PlanetMenu/Panel/PlanetGarrison");
+		planetShipButton = GameObject.Find("/PlanetMenu/Panel/CreateShip");
 		canvasUI = GameObject.Find("/PlanetMenu");
 		connectedPlanets = new List<GameObject>();
 		listOfRoutes = new List<GameObject>();
@@ -60,6 +62,7 @@ public class Planet : MonoBehaviour, IPointerClickHandler, IBreadthFirstSearchIn
 	 * @param eventData - Information about the event that we don't really care currently about
 	 */
 	public void OnPointerClick(PointerEventData eventData) {
+		planetShipButton.GetComponent<PlanetDisplay>().setPlanet(gameObject);
 		planetInfo.GetComponent<PlanetDisplay>().setName(planetName);
 		planetGarrison.GetComponent<PlanetDisplay>().setGarrisons(garrisons);
 		canvasUI.SetActive(true);

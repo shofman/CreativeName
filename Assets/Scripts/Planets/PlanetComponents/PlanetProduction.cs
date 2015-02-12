@@ -24,7 +24,6 @@ public class PlanetProduction : MonoBehaviour {
 	 * Creates a ship
 	 	* Either creates a new fleet if no ships are present, or adds the new ship to a fleet
 	 *
-	 * @return {[type]}
 	 */
 	public void createShip() {
 		GameObject fleet = gameObject.GetComponent<Planet>().getFleetOverPlanet();
@@ -35,6 +34,5 @@ public class PlanetProduction : MonoBehaviour {
 		GameObject ship = (GameObject) Instantiate (shipObject);
 		ship.GetComponent<Ship>().setName("HAR");
 		fleet.GetComponent<Fleet>().addShipToFleet(ship);
-		fleet.GetComponent<Fleet>().listShipsInFleet();
 	}
 }
