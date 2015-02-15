@@ -26,17 +26,29 @@ public class Planet : MonoBehaviour, IPointerClickHandler, IBreadthFirstSearchIn
 	public float lineWidth;
 	
 	GameObject canvasUI;
-	GameObject planetInfo;
-	GameObject planetGarrison;
-	GameObject planetShipButton;
+	GameObject tabManager;
 	GameObject fleetOverPlanet;
+
+	// Displays for planet
+	GameObject shipDisplay;
+	GameObject troopDisplay;
+	GameObject peopleDisplay;
+	GameObject productionDisplay;
+	GameObject planetDisplay;
 	System.Random random;
 
 	void Awake() {
-		planetInfo = GameObject.Find("/PlanetMenu/Panel/PlanetInfo");
-		planetGarrison = GameObject.Find("/PlanetMenu/Panel/PlanetGarrison");
-		planetShipButton = GameObject.Find("/PlanetMenu/Panel/CreateShip");
 		canvasUI = GameObject.Find("/PlanetMenu");
+		tabManager = GameObject.Find("/PlanetMenu/Panel");
+
+		// Setup the displays
+		shipDisplay = GameObject.Find("/PlanetMenu/Panel/DisplayHolder/ShipDisplay");
+		troopDisplay = GameObject.Find("/PlanetMenu/Panel/DisplayHolder/TroopDisplay");
+		peopleDisplay = GameObject.Find("/PlanetMenu/Panel/DisplayHolder/PeopleDisplay");
+		productionDisplay = GameObject.Find("/PlanetMenu/Panel/DisplayHolder/ProductionDisplay");
+		planetDisplay = GameObject.Find("/PlanetMenu/Panel/DisplayHolder/PlanetDisplay");
+
+		
 		connectedPlanets = new List<GameObject>();
 		listOfRoutes = new List<GameObject>();
 		random = new System.Random ();
@@ -62,9 +74,23 @@ public class Planet : MonoBehaviour, IPointerClickHandler, IBreadthFirstSearchIn
 	 * @param eventData - Information about the event that we don't really care currently about
 	 */
 	public void OnPointerClick(PointerEventData eventData) {
-		planetShipButton.GetComponent<PlanetDisplay>().setPlanet(gameObject);
-		planetInfo.GetComponent<PlanetDisplay>().setName(planetName);
-		planetGarrison.GetComponent<PlanetDisplay>().setGarrisons(garrisons);
+		// Initialize the planet for the displays
+		shipDisplay.GetComponent<Display>().setPlanet(gameObject);
+		troopDisplay.GetComponent<Display>().setPlanet(gameObject);
+		peopleDisplay.GetComponent<Display>().setPlanet(gameObject);
+		productionDisplay.GetComponent<Display>().setPlanet(gameObject);
+		planetDisplay.GetComponent<Display>().setPlanet(gameObject);
+
+		// If the menu is closed, open it and show the currently selected tab
+		tabManager.GetComponent<TabManager>().enableDisplayOnOpen();
+		
+		// Set the name for the planet display tab
+		planetDisplay.GetComponent<PlanetDisplay>().setName(planetName);
+
+		// Set the garrison amount for the troop display tab
+		troopDisplay.GetComponent<TroopDisplay>().setGarrisons(garrisons);
+
+		// Activate the main menu
 		canvasUI.SetActive(true);
 	}
 

@@ -22,6 +22,9 @@ public class TurnDisplay : MonoBehaviour {
 
 	}
 
+	/**
+	 * Increments the turn count 
+	 */
 	public void updateCount() {
 		turnCount++;
 		txt.text = "Turn: " + turnCount;

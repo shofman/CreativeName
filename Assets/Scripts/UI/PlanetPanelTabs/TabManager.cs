@@ -32,6 +32,9 @@ public class TabManager : MonoBehaviour {
 	//The tab that is currently selected
 	private GameObject currentlySelectedTab;
 
+	//Whether or not the planet info panel is currently open
+	private bool isOpen;
+
 	void Awake() {
 		// Add every tab to our list of tabs 
 		listOfTabs = new List<GameObject>();
@@ -49,8 +52,11 @@ public class TabManager : MonoBehaviour {
 		//Setup the listeners to listen for button clicks
 		setupListeners();
 
-		// Sets the 
+		// Sets the current tab to be ship
 		setCurrentlySelectedTab(shipTab);
+
+		// The menu is not displayed on initial load
+		isOpen = false;
 	}
 
 	/**
@@ -134,12 +140,40 @@ public class TabManager : MonoBehaviour {
 	}
 
 	/**
-	 * Goes through the list and deactivates all the tabs present
+	 * Goes through the list and deactivates all the tabs present. Then enable the one currently selected
 	 */
 	public void deactivateAllTabs() {
 		foreach (GameObject tab in listOfTabs) {
 			deactiveTab(tab);
+			tab.GetComponent<Tab>().disableDisplay();
 		}
+	}
+
+	/**
+	 * When opening the menu from a closed state, we want to only show the currently selected tab
+	 */
+	public void enableDisplayOnOpen() {
+		if (!isMenuOpen()) {
+			setOpen(true);
+			deactivateAllTabs();
+			enableCurrentlySelectedTab();
+		}
+	}
+
+	/**
+	 * Sets the state of the menu (closed or open)
+	 * @param {[type]} bool open - Whether the menu should be closed or open
+	 */
+	public void setOpen(bool open) {
+		isOpen = open;
+	}
+
+	/**
+	 * Returns whether the menu is open or not
+	 * @return {Boolean} Is the menu open
+	 */
+	public bool isMenuOpen() {
+		return isOpen;
 	}
 
 	/**
@@ -156,6 +190,15 @@ public class TabManager : MonoBehaviour {
 	 */
 	private void setCurrentlySelectedTab(GameObject tab) {
 		currentlySelectedTab = tab;
-		setNormalColor(tab, buttonHighlighted);
+		enableCurrentlySelectedTab();
+	}
+
+	/**
+	 * Performs the logic for enabling the currently selected tab 
+	 * Sets the color of the button and enables the object within the scene
+	 */
+	private void enableCurrentlySelectedTab() {
+		setNormalColor(currentlySelectedTab, buttonHighlighted);
+		currentlySelectedTab.GetComponent<Tab>().enableDisplay();
 	}
 }
