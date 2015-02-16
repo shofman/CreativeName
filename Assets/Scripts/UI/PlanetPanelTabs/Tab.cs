@@ -22,7 +22,7 @@ public abstract class Tab : MonoBehaviour {
 
 	public abstract ITabDisplayInterface getEnablingScript();
 
-	public void enableDisplay() {
+	public virtual void enableDisplay() {
 		getEnablingScript().enableDisplay();
 	}
 

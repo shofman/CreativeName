@@ -32,6 +32,7 @@ public class PlanetProduction : MonoBehaviour {
 			gameObject.GetComponent<Planet>().setFleet(fleet);
 		}
 		GameObject ship = (GameObject) Instantiate (shipObject);
+		ship.transform.parent = fleet.transform;
 		ship.GetComponent<Ship>().setName("HAR");
 		fleet.GetComponent<Fleet>().addShipToFleet(ship);
 	}

@@ -16,16 +16,6 @@ public class Display : MonoBehaviour, ITabDisplayInterface {
 		planetToDisplay = null;
 	}
 
-	// Use this for initialization
-	void Start () {
-
-	}
-	
-	// Update is called once per frame
-	void Update () {
-
-	}
-
 	/**
 	 * Sets the planet for the menu to display
 	 * @param {[type]} GameObject planet The planet we want to display

@@ -37,6 +37,9 @@ public class Planet : MonoBehaviour, IPointerClickHandler, IBreadthFirstSearchIn
 	GameObject planetDisplay;
 	System.Random random;
 
+	// Boolean for detecting whether we are trying to transfer a fleet to this planet
+	bool areTransferingAFleet = false;
+
 	void Awake() {
 		canvasUI = GameObject.Find("/PlanetMenu");
 		tabManager = GameObject.Find("/PlanetMenu/Panel");
@@ -47,7 +50,6 @@ public class Planet : MonoBehaviour, IPointerClickHandler, IBreadthFirstSearchIn
 		peopleDisplay = GameObject.Find("/PlanetMenu/Panel/DisplayHolder/PeopleDisplay");
 		productionDisplay = GameObject.Find("/PlanetMenu/Panel/DisplayHolder/ProductionDisplay");
 		planetDisplay = GameObject.Find("/PlanetMenu/Panel/DisplayHolder/PlanetDisplay");
-
 		
 		connectedPlanets = new List<GameObject>();
 		listOfRoutes = new List<GameObject>();
@@ -64,9 +66,17 @@ public class Planet : MonoBehaviour, IPointerClickHandler, IBreadthFirstSearchIn
 	
 	// Update is called once per frame
 	void Update () {
-		if(Input.GetKeyDown("space")) {
-			
-		}
+
+	}
+
+	/**
+	 * Sets whether we are trying to transfer a fleet to this planet
+	 * We use this method to get around the limitations of the UI detection
+	 * (Raycasts do not get detected on the UI elements, so we want to prevent clicks from falling through)
+	 * @param {[type]} bool isTransfering [description]
+	 */
+	public void setTransferingFleet(bool isTransfering) {
+		areTransferingAFleet = isTransfering;
 	}
 
 	/**
@@ -74,6 +84,21 @@ public class Planet : MonoBehaviour, IPointerClickHandler, IBreadthFirstSearchIn
 	 * @param eventData - Information about the event that we don't really care currently about
 	 */
 	public void OnPointerClick(PointerEventData eventData) {
+		if (areTransferingAFleet) {
+			// Take the fleet at the currently selected planet, and move it to this planet
+			GameObject currentlySelectedPlanet = shipDisplay.GetComponent<Display>().getPlanet();
+			currentlySelectedPlanet.GetComponent<Planet>().moveFleet(gameObject);
+		} else {
+			activatePlanetMenu();
+		}
+		areTransferingAFleet = false;
+	}
+
+	/**
+	 * Activates the displays for showing the planet menu 
+	 * This is what will show the planet statistics, fleet information, etc
+	 */
+	private void activatePlanetMenu() {
 		// Initialize the planet for the displays
 		shipDisplay.GetComponent<Display>().setPlanet(gameObject);
 		troopDisplay.GetComponent<Display>().setPlanet(gameObject);
@@ -307,11 +332,27 @@ public class Planet : MonoBehaviour, IPointerClickHandler, IBreadthFirstSearchIn
 		this.galaxyPositionY = positionY;
 	}
 
+	/**
+	 * Updates the fleet above the planet
+	 * @param GameObject fleet The fleet object we want to add to our planet's fleet
+	 */
 	public void setFleet(GameObject fleet) {
 		fleetOverPlanet = fleet;
 	}
 
+	/**
+	 * Finds the fleet above the planet
+	 * @return GameObject the fleet currently above the planet
+	 */
 	public GameObject getFleetOverPlanet() {
 		return fleetOverPlanet;
+	}
+
+	/**
+	 * Transfers the fleet to the planet provided
+	 * @param  GameObject planetToMoveTo - The planet we want to move to 
+	 */
+	public void moveFleet(GameObject planetToMoveTo) {
+		Debug.Log("MOVE THE FLEET HERE");
 	}
 }

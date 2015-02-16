@@ -3,3 +3,8 @@ Rules To Implement
 
 Limit amount of people that can be hired from planet
 Artifacts within galaxy (gives bonus if entire galaxy is controlled, but will be the focal point of invasion)
+
+Things to Consider
+------------------
+
+Each planet currently houses an independent reference to the canvasUI object. For performance considerations, we might wish to pull this out to a single reference, and somehow pass that to the Planet

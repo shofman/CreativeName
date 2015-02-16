@@ -155,9 +155,10 @@ public class TabManager : MonoBehaviour {
 	public void enableDisplayOnOpen() {
 		if (!isMenuOpen()) {
 			setOpen(true);
-			deactivateAllTabs();
-			enableCurrentlySelectedTab();
 		}
+		deactivateAllTabs();
+		enableCurrentlySelectedTab();
+
 	}
 
 	/**
